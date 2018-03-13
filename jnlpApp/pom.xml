@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>jnlp-test</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>jnlpApp</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>jnlpApp</name>
+    <packaging>jar</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.url>http://localhost:8080</project.url>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>app</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>webstart-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>jnlp-download-servlet</id>
+                        <goals>
+                            <goal>jnlp-download-servlet</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!--outputDirectory></outputDirectory--> <!-- not required?? -->
+                    <outputDirectoryName>jnlp</outputDirectoryName>
+
+                    <excludeTransitive>true</excludeTransitive>
+
+                    <!-- The path where the libraries are stored within the jnlp structure. not required. by default the libraries are within the working directory -->
+                    <libPath>lib</libPath>
+
+                    <!--resourcesDirectory>${project.basedir}/src/main/jnlp/resources</resourcesDirectory--> <!-- default value -->
+
+                    <!-- JNLP generation -->
+                    <jnlp>
+                        <!-- default values -->
+                        <!--inputTemplateResourcePath>${project.basedir}</inputTemplateResourcePath-->
+                        <!--inputTemplate>src/main/jnlp/template.vm</inputTemplate--> <!-- relative to inputTemplateResourcePath -->
+                        <outputFile>app.jnlp</outputFile> <!-- defaults to launch.jnlp -->
+
+                        <!-- used to automatically identify the jar containing the main class. -->
+                        <!-- this is perhaps going to change -->
+                        <mainClass>jnlp.test.App</mainClass>
+                    </jnlp>
+
+
+                    <!-- SIGNING -->
+                    <!-- defining this will automatically sign the jar and its dependencies, if necessary -->
+                    <sign>
+                        <keystore>${project.basedir}/keystore</keystore>
+                        <keypass>fillme
+                        </keypass>  <!-- we need to override passwords easily from the command line. ${keypass} -->
+                        <storepass>fillme</storepass> <!-- ${storepass} -->
+                        <storetype>PKCS12</storetype>
+                        <alias>fillme</alias>
+
+                        <!--validity>fillme</validity-->
+
+                        <!-- only required for generating the keystore -->
+                        <dnameCn>fillme</dnameCn>
+                        <dnameOu>fillme</dnameOu>
+                        <dnameO>fillme</dnameO>
+                        <dnameL>fillme</dnameL>
+                        <dnameSt>fillme</dnameSt>
+                        <dnameC>fillme</dnameC>
+
+                        <verify>true</verify> <!-- verify that the signing operation succeeded -->
+
+                        <!-- KEYSTORE MANAGEMENT -->
+                        <keystoreConfig>
+                            <delete>true</delete> <!-- delete the keystore -->
+                            <gen>true</gen>       <!-- optional shortcut to generate the store. -->
+                        </keystoreConfig>
+                    </sign>
+
+                    <!-- BUILDING PROCESS -->
+
+                    <!-- pack200>true</pack200>
+                    <gzip>true</gzip--> <!-- default force when pack200 false, true when pack200 selected ?? -->
+
+                    <!-- causes a version attribute to be output in each jar resource element, optional, default is false -->
+                    <outputJarVersions>true</outputJarVersions>
+
+                    <!--install>false</install--> <!-- not yet supported -->
+                    <verbose>true</verbose>
+
+                    <jnlpFiles>
+                        <jnlpFile>
+                            <!-- templateFilename>jnlpTemplate.vm</templateFilename-->
+                            <outputFilename>app.jnlp</outputFilename>
+                            <jarResources>
+                                <jarResource>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>app</artifactId>
+                                    <version>${project.version}</version>
+                                    <mainClass>jnlp.test.App</mainClass>
+                                    <outputJarVersion>true</outputJarVersion>
+                                </jarResource>
+                            </jarResources>
+                        </jnlpFile>
+                    </jnlpFiles>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
+                        <phase>package</phase> <!-- bind to the packaging phase -->
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>assembly.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
